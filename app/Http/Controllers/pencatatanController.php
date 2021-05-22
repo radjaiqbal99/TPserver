@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\pencatatan;
 use App\Models\tglTransaksi;
 use App\Models\hargaPasir;
-use App\Models\daftarKasir;
-use App\Models\daftarPegawai;
+use App\Models\DaftarKasir;
+use App\Models\DaftarPegawai;
 use App\Models\dompetKasir;
 use App\Models\dompetPegawai;
 use App\Models\upahKasir;
@@ -35,8 +35,8 @@ class pencatatanController extends Controller
     public function resourcesForm()
     {
         $hargaPasir = hargaPasir::get();
-        $daftarKasir = daftarKasir::get();
-        $daftarPegawai = daftarPegawai::get();
+        $daftarKasir = DaftarKasir::get();
+        $daftarPegawai = DaftarPegawai::get();
 
         $response = [
             'hargaPasir' => $hargaPasir,
