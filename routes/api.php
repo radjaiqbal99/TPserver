@@ -46,7 +46,7 @@ Route::post('/login', [LoginController::class,'login']);
 // Route::resource('/hargaPasir', daftarKasirController::class);
 Route::get('/dompetKasir', [dompetKasirController::class,'index']);
 Route::get('/dompetPegawai', [dompetPegawaiController::class,'index']);
-Route::get('/rf', [ResourcesController::class, 'index']);
+Route::get('/rf', [pencatatanController::class, 'resourcesForm']);
 Route::get('/pencatatan', [pencatatanController::class, 'index']);
 Route::post('/pencatatan', [pencatatanController::class, 'store']);
 
