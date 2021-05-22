@@ -34,8 +34,8 @@ use Illuminate\Http\Resources\Json\ResourceResponse;
 //     return $request->user();
 // });
 /// login
-header('Access-Control-Allow-Origin: http://natunasandmine.com');
-header('Access-Control-Allow-Headers: http://natunasandmine.com');
+// header('Access-Control-Allow-Origin: http://natunasandmine.com');
+// header('Access-Control-Allow-Headers: http://natunasandmine.com');
 Route::post('/login', [LoginController::class,'login']);
 // daftar pegawai
 
