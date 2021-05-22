@@ -23,8 +23,8 @@ class ResourcesController extends Controller
 
         $response = [
             'hargaPasir' => $hargaPasir,
-            'daftarKasir' => $daftarKasir,
-            'daftarPegawai' => $daftarPegawai,
+            // 'daftarKasir' => $daftarKasir,
+            // 'daftarPegawai' => $daftarPegawai,
         ];
         return response()->json($response, Response::HTTP_OK);
     }
