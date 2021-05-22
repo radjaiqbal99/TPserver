@@ -14,11 +14,11 @@ use App\Http\Controllers\pencatatanController;
 use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Resources\Json\ResourceResponse;
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: OPTIONS, POST, GET, PUT, DELETE');
-header('Access-Control-Allow-Headers: *');
-header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Credentials: true');
+// header('Access-Control-Allow-Origin: http://natunasandmine.com');
+// header('Access-Control-Allow-Methods: OPTIONS, POST, GET, PUT, DELETE');
+// header('Access-Control-Allow-Headers: http://natunasandmine.com');
+// header('Access-Control-Allow-Credentials: true');
+// header('Access-Control-Allow-Credentials: true');
 /*
 |--------------------------------------------------------------------------
 | API Routes
