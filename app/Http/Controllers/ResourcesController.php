@@ -26,7 +26,7 @@ class ResourcesController extends Controller
             'daftarKasir' => $daftarKasir,
             'daftarPegawai' => $daftarPegawai,
         ];
-        return response()->json($response, Response::HTTP_OK)->header('Access-Control-Allow-Origin','*');
+        return response()->json($response, Response::HTTP_OK);
     }
 
     /**

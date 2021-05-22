@@ -34,6 +34,7 @@ use Illuminate\Http\Resources\Json\ResourceResponse;
 //     return $request->user();
 // });
 /// login
+header('Access-Control-Allow-Origin', '*');
 Route::post('/login', [LoginController::class,'login']);
 // daftar pegawai
 
