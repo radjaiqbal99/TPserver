@@ -11,8 +11,9 @@ use App\Http\Controllers\upahPegawaiController;
 use App\Http\Controllers\upahKasirController;
 use App\Http\Controllers\hargaPasirController;
 use App\Http\Controllers\pencatatanController;
+use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Http\Resources\Json\ResourceResponse;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,7 +40,7 @@ Route::post('/login', [LoginController::class,'login']);
 // Route::resource('/hargaPasir', daftarKasirController::class);
 Route::get('/dompetKasir', [dompetKasirController::class,'index']);
 Route::get('/dompetPegawai', [dompetPegawaiController::class,'index']);
-Route::get('/resourcesForm', [pencatatanController::class, 'resourcesForm']);
+Route::get('/resourcesForm', [ResourcesController::class, 'index']);
 Route::get('/pencatatan', [pencatatanController::class, 'index']);
 Route::post('/pencatatan', [pencatatanController::class, 'store']);
 
