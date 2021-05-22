@@ -15,7 +15,6 @@ use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Resources\Json\ResourceResponse;
 
-header('Access-Control-Allow-Origin: *');
 /*
 |--------------------------------------------------------------------------
 | API Routes
