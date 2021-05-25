@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\upahPegawai;
+use App\Models\hargaPasir;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +19,21 @@ class upahPegawaiController extends Controller
     public function index()
     {
         $result = upahPegawai::get();
-        $response = $result;
+        $rs = [];
+        $result1 = hargaPasir::get();
+        if ($result1) {
+            for ($i = 0; $i < count($result1); $i++) {
+                $find = upahPegawai::where('satuan', $result1[$i]['jumlah'])->first();
+                if (!$find) {
+                    $rs[] = ["satuan" => $result1[$i]['jumlah']];
+                    // $rs[$i]="i";
+                }
+            }
+        }
+        $response = [
+            'data' => $result,
+            'satuan' => $rs
+        ];
         return response()->json($response, Response::HTTP_OK);
     }
 

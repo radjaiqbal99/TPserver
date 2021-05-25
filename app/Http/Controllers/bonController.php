@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\dompetPegawai;
-use App\Models\transaksiDompetPegawai;
+use App\Models\bonTruk;
+use App\Models\transaksiBonTruk;
 use Illuminate\Http\Request;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
-class dompetPegawaiController extends Controller
+class bonController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,13 +16,13 @@ class dompetPegawaiController extends Controller
      */
     public function index()
     {
-        $result = dompetPegawai::get();
-        // $result2 = transaksiDompetKasir::get();
+        $result = bonTruk::get();
+        // $result2 = transaksibonTruk::get();
         for ($i = 0; $i < count($result); $i++) {
-            $transaksi = transaksiDompetPegawai::where('id_dompet', $result[$i]['id_dompet'])->get();
+            $transaksi = transaksiBonTruk::where('id_bon', $result[$i]['id_bon'])->get();
             $response[$i] = [
                 'id' => $result[$i]['id'],
-                'id_dompet' => $result[$i]['id_dompet'],
+                'id_dompet' => $result[$i]['id_bon'],
                 'name' => $result[$i]['name'],
                 'saldo' => $result[$i]['saldo'],
                 'transaksi' => $transaksi
@@ -41,7 +39,7 @@ class dompetPegawaiController extends Controller
      */
     public function create()
     {
-        
+        //
     }
 
     /**

@@ -11,6 +11,6 @@ class pencatatan extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'no_transaksi', 'tgl_transaksi', 'jenis_transaksi', 'satuan', 'qty', 'pekerja','kasir','harga', 'keterangan','pendapatanBersih'
+        'no_transaksi', 'tgl_transaksi', 'jenis_transaksi', 'satuan', 'qty', 'pekerja','kasir','harga','upahPegawai', 'upahKasir', 'keterangan','pendapatanBersih'
     ];
 }

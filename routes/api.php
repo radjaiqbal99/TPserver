@@ -11,6 +11,8 @@ use App\Http\Controllers\upahPegawaiController;
 use App\Http\Controllers\upahKasirController;
 use App\Http\Controllers\hargaPasirController;
 use App\Http\Controllers\pencatatanController;
+use App\Http\Controllers\bonController;
+use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Resources\Json\ResourceResponse;
@@ -76,4 +78,6 @@ Route::get('/hargaPasir', [hargaPasirController::class, 'index']);
 Route::post('/hargaPasir', [hargaPasirController::class, 'store']);
 Route::put('/hargaPasir/{id}', [hargaPasirController::class, 'update']);
 Route::delete('/hargaPasir/{id}', [hargaPasirController::class, 'destroy']);
-// Pencatatan
+// Bon
+Route::get('/bon', [bonController::class, 'index']);
+Route::get('/dashboard', [dashboardController::class, 'index']);

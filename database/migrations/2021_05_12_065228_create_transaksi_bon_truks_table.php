@@ -15,13 +15,14 @@ class CreateTransaksiBonTruksTable extends Migration
     {
         Schema::create('transaksi_bon_truks', function (Blueprint $table) {
             $table->id();
-            $table->string("no_transaksi");
-            $table->date("tgl_transaksi");
-            $table->string("kasir");
-            $table->enum("jenis_transaksi", ["Bon,Pembayaran"]);
-            $table->string("satuan");
-            $table->integer("qty");
-            $table->bigInteger("Harga");
+            $table->string("id_bon");
+            $table->string("no_transaksi")->nullable();
+            $table->date("tgl_transaksi")->nullable();
+            $table->string("kasir")->nullable();
+            $table->enum("jenis_transaksi", ['Bon','Pembayaran'])->nullable();
+            $table->string("satuan")->nullable();
+            $table->integer("qty")->nullable();
+            $table->bigInteger("Harga")->nullable();
         });
     }
 

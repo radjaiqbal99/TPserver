@@ -20,7 +20,7 @@ return [
     'allowed_methods' => ['*'],
 
     // 'allowed_origins' => ['https://natunasandmine.com'],
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://natunasandmine.com'],
 
     'allowed_origins_patterns' => [],
 

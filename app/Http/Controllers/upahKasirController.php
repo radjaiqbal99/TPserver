@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\upahKasir;
+use App\Models\hargaPasir;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
+
 class upahKasirController extends Controller
 {
     /**
@@ -17,7 +19,21 @@ class upahKasirController extends Controller
     public function index()
     {
         $result = upahKasir::get();
-        $response = $result;
+        $rs = [];
+        $result1 = hargaPasir::get();
+        if ($result1) {
+            for ($i = 0; $i < count($result1); $i++) {
+                $find = upahKasir::where('satuan', $result1[$i]['jumlah'])->first();
+                if (!$find) {
+                    $rs[] = ["satuan" => $result1[$i]['jumlah']];
+                    // $rs[$i]="i";
+                }
+            }
+        }
+        $response = [
+            'data' => $result,
+            'satuan' => $rs
+        ];
         return response()->json($response, Response::HTTP_OK);
     }
 

@@ -52,7 +52,8 @@ class daftarKasirController extends Controller
             ]);
             dompetKasir::create([
                 'id_dompet' => $id_dompet,
-                'name' => $request->name
+                'name' => $request->name,
+                'saldo'=>0
             ]);
             $response = [
                 'message' => "Success",

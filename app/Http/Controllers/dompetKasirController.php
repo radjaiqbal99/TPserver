@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\dompetKasir;
+use App\Models\transaksiDompetKasir;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
@@ -18,8 +19,19 @@ class dompetKasirController extends Controller
     public function index()
     {
         $result = dompetKasir::get();
-        $response = $result;
-        return response()->json($response, Response::HTTP_OK);
+        // $result2 = transaksiDompetKasir::get();
+        for ($i = 0; $i < count($result); $i++) {
+            $transaksi = transaksiDompetKasir::where('id_dompet', $result[$i]['id_dompet'])->get();
+            $response[$i] = [
+                'id' => $result[$i]['id'],
+                'id_dompet' => $result[$i]['id_dompet'],
+                'name' => $result[$i]['name'],
+                'saldo' => $result[$i]['saldo'],
+                'transaksi' => $transaksi
+            ];
+        };
+        $Respon = $response;
+        return response()->json($Respon, Response::HTTP_OK);
     }
 
     /**

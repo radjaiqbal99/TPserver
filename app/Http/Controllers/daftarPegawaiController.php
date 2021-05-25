@@ -65,7 +65,8 @@ class daftarPegawaiController extends Controller
             ]);
             dompetPegawai::create([
                 'id_dompet'=>$id_dompet,
-                'name'=>$request->name 
+                'name'=>$request->name,
+                'saldo'=>0 
             ]);
             $response=[
                 'message' => "Success",
