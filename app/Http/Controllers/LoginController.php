@@ -19,24 +19,43 @@ class LoginController extends Controller
             'username' => ['required'],
             'password' => ['required']
         ]);
-
+        // $checkLogin=User::where('username',$request->username)->where('password')
         if ($validator->fails()) {
             return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+        $checkLogin = Auth::check();
+        if (!$checkLogin) {
+            if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+                $response = [
+                    'data' => [
+                        'info' => 'Selamat Datang',
+                        'premission' => 'true',
 
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
-            $response = [
-                'data' => [
-                    'info' => 'Selamat Datang',
-                    'premission' => 'true'
-                ]
-            ];
-            return response()->json($response, Response::HTTP_OK);
-        }else{
-        $response = [
-            'message' => ['Username Atau Password Salah'],
-        ];
-        return response()->json($response, Response::HTTP_NOT_FOUND);
+                    ]
+                ];
+                return response()->json($response, Response::HTTP_OK);
+            } else {
+                $response = [
+                    'message' => ['Username Atau Password Salah'],
+                ];
+                return response()->json($response, Response::HTTP_NOT_FOUND);
+            }
+        } else {
+            if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+                $response = [
+                    'data' => [
+                        'info' => 'Selamat Datang',
+                        'premission' => 'true',
+
+                    ]
+                ];
+                return response()->json($response, Response::HTTP_OK);
+            } else {
+                $response = [
+                    'message' => ['Username Atau Password Salah'],
+                ];
+                return response()->json($response, Response::HTTP_NOT_FOUND);
+            }
         }
     }
 }
