@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         DB::table('users')->insert([
             'name' => 'Administrator',
             'username' => 'admin',
-            'password' => bcrypt('admin'),
+            'password' => bcrypt('tpS123123'),
             'status' => '0',
             'remember_token' => Str::random(50)
         ]);
