@@ -25,9 +25,11 @@ class dashboardController extends Controller
             // if (strlen($i)<10){
             //     $find = pencatatan::where("tgl_transaksi", "$date" . "-0" . "$i")->where("jenis_transaksi", "Pembelian pasir")->get();
             // };
-            $find = pencatatan::where("tgl_transaksi", "$date" . "-" . "$i")->where("jenis_transaksi", "Pembelian pasir")->orWhere("jenis_transaksi",'Bon truk')->get();
+            $find = pencatatan::where("tgl_transaksi", "$date" . "-" . "$i")->where("jenis_transaksi", "Pembelian pasir")->get();
+            $find2 = pencatatan::where("tgl_transaksi", "$date" . "-" . "$i")->where("jenis_transaksi", "Bon truk")->get();
             $date1[$i - 1] = "$date" . "-" . "$i";
-            $jumlah[$i - 1] = count($find);
+            $jumlah[$i - 1] = count($find)+count($find2);
+            
         }
         //PPENDAPATAN BERSIH
         $pendapatan= pencatatan::where("jenis_transaksi","Pembelian pasir")->orWhere("jenis_transaksi",'Pembayaran Bon Truk')->get();
@@ -35,7 +37,8 @@ class dashboardController extends Controller
             $pendaptanBersih+=$pendapatan[$i]['pendapatanBersih'];
         }
         //JUMLAH PENJUALAN
-        $jumlahpenjualan= pencatatan::where("jenis_transaksi", "Pembelian pasir")->orWhere("jenis_transaksi", 'Bon truk')->get();
+        $jumlahpenjualan1= pencatatan::where("jenis_transaksi", "Pembelian pasir")->get();
+        $jumlahpenjualan2= pencatatan::where("jenis_transaksi", "Bon truk")->get();
         //JUMLAH TRANSAKSI
         $jumlahtransaksi= pencatatan::get();
 
@@ -71,7 +74,7 @@ class dashboardController extends Controller
         }
 
         $response = [
-            "jumlahpenjualan" => count($jumlahpenjualan),
+            "jumlahpenjualan" => count($jumlahpenjualan1)+count($jumlahpenjualan2),
             "jumlahtransaksi" => count($jumlahtransaksi),
             "pendapatanBersih" => $pendaptanBersih,
             "jumlahBon" => $bon3,

@@ -67,7 +67,7 @@ class pencatatanController extends Controller
             $resultMatchDate = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->get();
             $resultMatchTransaksiPenjualanPasir = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Pembelian pasir')->orWhere('jenis_transaksi','Bon truk')->get();
             $resultMatchTransaksiBonTruk = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Bon truk')->get();
-            $resultMatchPendapatanBersih = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Pembelian pasir')->orWhere('jenis_transaksi', 'Pembayaran Bon Truk')->get();
+            $resultMatchPendapatanBersih = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Pembelian pasir')-> orWhere('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Pembayaran Bon Truk')->get();
             $resultMatchPengeluaranTambang= pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Pengeluaran tambang')->get();
             $resultMatchDepositPegawai= pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Penarikan deposit pegawai')->get();
             $resultMatchdepositKasir= pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Penarikan deposit Kasir')->get();
@@ -462,13 +462,94 @@ class pencatatanController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Store a newly created resource in storage.
      *
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete(Request $request)
     {
-        //
+        if($request->jenis_transaksi ==="Pembelian pasir"){
+            //pencatatan
+            pencatatan::where("no_transaksi",$request->no_transaksi)->delete();
+            //Transaksi kasir
+            $transaksikasir=transaksiDompetKasir::where("nomor_transaksi",$request->no_transaksi)->get();
+            $deompetkasir=dompetKasir::where("id_dompet",$transaksikasir[0]["id_dompet"])->get();
+            $saldokasir=intval($deompetkasir[0]["saldo"])-intval($transaksikasir[0]["nominal"]);
+            $deompetkasir[0]->update([
+                "saldo"=>$saldokasir
+            ]);
+            $transaksikasir[0]->delete();
+            //transaksi pegawai
+            $transaksipegawai=transaksiDompetPegawai::where("nomor_transaksi", $request->no_transaksi)->get();
+            for($i=0;$i<count($transaksipegawai);$i++){
+                $dompetpegawai=dompetPegawai::where("id_dompet",$transaksipegawai[$i]["id_dompet"])->get();
+                $saldopegawai=intval($dompetpegawai[0]["saldo"])-intval($transaksipegawai[$i]['nominal']);
+                $dompetpegawai[0]->update([
+                    "saldo"=>$saldopegawai
+                ]);
+            }
+            for($z=0;$z< count($transaksipegawai); $z++){
+                $transaksipegawai[$z]->delete();
+            }
+        }else if($request->jenis_transaksi==="Pengeluaran tambang"){
+            pencatatan::where("no_transaksi",$request->no_transaksi)->delete();
+        }else if($request->jenis_transaksi==="Penarikan deposit Kasir"){
+            pencatatan::where("no_transaksi",$request->no_transaksi)->delete();
+            $saldokasir = transaksiDompetKasir::where("nomor_transaksi",$request->no_transaksi)->first();
+            $getDompet = dompetKasir::where("id_dompet",$saldokasir->id_dompet)->first();
+            $saldo= intval($getDompet->saldo)+intval($saldokasir->nominal);
+            $getDompet->update([
+                "saldo"=>$saldo,
+            ]);
+            $saldokasir->delete();
+        }else if($request->jenis_transaksi==="Penarikan deposit pegawai"){
+            pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
+            $saldopegawai = transaksiDompetPegawai::where("nomor_transaksi", $request->no_transaksi)->first();
+            $getDompet = dompetPegawai::where("id_dompet", $saldopegawai->id_dompet)->first();
+            $saldo = intval($getDompet->saldo) + intval($saldopegawai->nominal);
+            $getDompet->update([
+                "saldo" => $saldo,
+            ]);
+            $saldopegawai->delete();
+        }else if($request->jenis_transaksi==="Bon truk"){
+            pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
+            //Transaksi kasir
+            $transaksikasir = transaksiDompetKasir::where("nomor_transaksi", $request->no_transaksi)->get();
+            $deompetkasir = dompetKasir::where("id_dompet", $transaksikasir[0]["id_dompet"])->get();
+            $saldokasir = intval($deompetkasir[0]["saldo"]) - intval($transaksikasir[0]["nominal"]);
+            $deompetkasir[0]->update([
+                "saldo" => $saldokasir
+            ]);
+            $transaksikasir[0]->delete();
+            //transaksi pegawai
+            $transaksipegawai = transaksiDompetPegawai::where("nomor_transaksi", $request->no_transaksi)->get();
+            for ($i = 0; $i < count($transaksipegawai); $i++) {
+                $dompetpegawai = dompetPegawai::where("id_dompet", $transaksipegawai[$i]["id_dompet"])->get();
+                $saldopegawai = intval($dompetpegawai[0]["saldo"]) - intval($transaksipegawai[$i]['nominal']);
+                $dompetpegawai[0]->update([
+                    "saldo" => $saldopegawai
+                ]);
+            }
+            for ($z = 0; $z < count($transaksipegawai); $z++) {
+                $transaksipegawai[$z]->delete();
+            }
+            $transaksibon = transaksiBonTruk::where("no_transaksi",$request->no_transaksi)->first();
+            $bon = bonTruk::where("id_bon",$transaksibon->id_bon)->first();
+            $saldo = intval($bon->saldo)-intval($transaksibon->Harga);
+            $bon->update([
+                "saldo"=>$saldo
+            ]);
+            $transaksibon->delete();
+        }else{
+            pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
+            $transaksibon= transaksiBonTruk::where("no_transaksi",$request->no_transaksi)->first();
+            $bon= bonTruk::where("id_bon",$transaksibon->id_bon)->first();
+            $saldo= intval($bon->saldo)+intval($transaksibon->Harga);
+            $bon->update([
+                "saldo"=>$saldo
+            ]);
+            $transaksibon->delete();
+        }
     }
 }

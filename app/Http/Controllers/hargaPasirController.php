@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\hargaPasir;
+use App\Models\upahKasir;
+use App\Models\upahPegawai;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
@@ -92,19 +94,30 @@ class hargaPasirController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = hargaPasir::findOrFail($id);
+        $result = hargaPasir::findOrFail($id)->first();
+        // $result1 = hargaPasir::where('id',$id)->first();
+
         $validator = Validator::make($request->all(), [
             'jumlah' => ['required'],
             'harga' => ['required']
         ]);
-
+        upahKasir::where('satuan', $result->jumlah)->update(['satuan'=>$request->jumlah]);
+        upahPegawai::where('satuan', $result->jumlah)->update(['satuan'=>$request->jumlah]);
+        // $updateUpahKasir->update([
+        //     'satuan' => $request->jumlah,
+        // ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+
         try {
+
+            // $updateUpahPegawai ->update([
+            //     'satuan'=>$request->jumlah,
+            // ]);
             $result->update($request->all());
             $response = [
-                'message' => "Success Update",
+                'message' => "success",
             ];
             return response()->json($response, Response::HTTP_OK);
         } catch (QueryException $e) {
@@ -123,6 +136,8 @@ class hargaPasirController extends Controller
     public function destroy($id)
     {
         $result = hargaPasir::findOrFail($id);
+        upahKasir::where('satuan', $result->jumlah)->delete();
+        upahPegawai::where('satuan', $result->jumlah)->delete();
         try {
             $result->delete();
             $response = [

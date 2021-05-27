@@ -39,6 +39,7 @@ use Illuminate\Http\Resources\Json\ResourceResponse;
 // header('Access-Control-Allow-Origin', 'http://natunasandmine.com');
 // header('Access-Control-Allow-Headers: http://natunasandmine.com');
 Route::post('/login', [LoginController::class,'login']);
+Route::post('/resetPassword', [LoginController::class,'update']);
 // daftar pegawai
 
 // Route::resource('/daftarPegawai', daftarPegawaiController::class);
@@ -51,6 +52,7 @@ Route::get('/dompetPegawai', [dompetPegawaiController::class,'index']);
 Route::get('/rf', [pencatatanController::class, 'resourcesForm']);
 Route::get('/pencatatan', [pencatatanController::class, 'index']);
 Route::post('/pencatatan', [pencatatanController::class, 'store']);
+Route::post('/pencatatanDelete', [pencatatanController::class, 'delete']);
 
 Route::get('/daftarPegawai', [daftarPegawaiController::class,'index']);
 Route::get('/daftarPegawai/{id}', [daftarPegawaiController::class,'show']);

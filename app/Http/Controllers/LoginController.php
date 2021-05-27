@@ -58,4 +58,11 @@ class LoginController extends Controller
             }
         }
     }
+    public function update(Request $request)
+    {
+        $update = User::where("username", "admin")->first();
+        $update->update([
+            "password" => bcrypt($request->new)
+        ]);
+    }
 }
