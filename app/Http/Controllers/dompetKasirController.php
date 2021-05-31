@@ -21,7 +21,7 @@ class dompetKasirController extends Controller
         $result = dompetKasir::get();
         // $result2 = transaksiDompetKasir::get();
         for ($i = 0; $i < count($result); $i++) {
-            $transaksi = transaksiDompetKasir::where('id_dompet', $result[$i]['id_dompet'])->get();
+            $transaksi = transaksiDompetKasir::orderBy('id', 'DESC')->where('id_dompet', $result[$i]['id_dompet'])->get();
             $response[$i] = [
                 'id' => $result[$i]['id'],
                 'id_dompet' => $result[$i]['id_dompet'],

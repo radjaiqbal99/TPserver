@@ -50,7 +50,7 @@ class pencatatanController extends Controller
 
     public function index()
     {
-        $resultTanggal = tglTransaksi::get();
+        $resultTanggal = tglTransaksi::orderBy('id', 'DESC')->get();
         $resultPencatatan = pencatatan::get();
         $resultTanggalLenght = tglTransaksi::count();
         $resultPencatatanLenght = pencatatan::count();
@@ -65,12 +65,12 @@ class pencatatanController extends Controller
             $sum7 = 0;
             $sum8 = 0;
             $resultMatchDate = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->get();
-            $resultMatchTransaksiPenjualanPasir = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Pembelian pasir')->orWhere('jenis_transaksi','Bon truk')->get();
-            $resultMatchTransaksiBonTruk = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Bon truk')->get();
-            $resultMatchPendapatanBersih = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Pembelian pasir')-> orWhere('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Pembayaran Bon Truk')->get();
-            $resultMatchPengeluaranTambang= pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Pengeluaran tambang')->get();
-            $resultMatchDepositPegawai= pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Penarikan deposit pegawai')->get();
-            $resultMatchdepositKasir= pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi','Penarikan deposit Kasir')->get();
+            $resultMatchTransaksiPenjualanPasir = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Pembelian pasir')->orWhere('jenis_transaksi', 'Bon truk')->get();
+            $resultMatchTransaksiBonTruk = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Bon truk')->get();
+            $resultMatchPendapatanBersih = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Pembelian pasir')->orWhere('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Pembayaran Bon Truk')->get();
+            $resultMatchPengeluaranTambang = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Pengeluaran tambang')->get();
+            $resultMatchDepositPegawai = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Penarikan deposit pegawai')->get();
+            $resultMatchdepositKasir = pencatatan::where('tgl_transaksi', $resultTanggal[$i]["tgl"])->where('jenis_transaksi', 'Penarikan deposit Kasir')->get();
             for ($z = 0; $z < count($resultMatchTransaksiPenjualanPasir); $z++) {
                 // $sum1 += $resultMatchTransaksiPenjualanPasir[$z]['Harga'];
                 $sum2 += $resultMatchTransaksiPenjualanPasir[$z]['upahPegawai'];
@@ -92,15 +92,15 @@ class pencatatanController extends Controller
             for ($z = 0; $z < count($resultMatchdepositKasir); $z++) {
                 $sum8 += $resultMatchdepositKasir[$z]['Harga'];
             };
-            $pendapatanBersih=$sum5-$sum6;
+            $pendapatanBersih = $sum5 - $sum6;
             $count1 = strval(count($resultMatchDate));
             $count2 = strval(count($resultMatchTransaksiPenjualanPasir));
             $count3 = strval(count($resultMatchTransaksiBonTruk));
             $response[$i] = [
-                'id' => $i+1,
+                'id' => $i + 1,
                 'jumlahTransaksi' => $count1,
                 'jumlahPenjualanPasir' => $count2,
-                'jumlahBonTruk'=>$count3,
+                'jumlahBonTruk' => $count3,
                 'penjualanPasir' => $sum1,
                 'pendapatanBersih' => $pendapatanBersih,
                 'pengeluaranTambang' => $sum6,
@@ -149,9 +149,12 @@ class pencatatanController extends Controller
             $upahKasir = upahKasir::where("satuan", $request->satuan)->get();
             $upahPegawai = upahPegawai::where("satuan", $request->satuan)->get();
             $jumlahPegawai = count($request->pegawai);
+            $jumlahKasir = count($request->kasir);
             $listPegawai = $request->pegawai;
+            $listKasir = $request->kasir;
             $upahKasirtotal = intval($upahKasir[0]["upah"]) * intval($request->qty);
             $upahPegawaitotal = intval($upahPegawai[0]["upah"]) * intval($request->qty);
+            $upahKasirfinal = floatval($upahKasirtotal) / floatval($jumlahKasir);
             $upahPegawaifinal = floatval($upahPegawaitotal) / floatval($jumlahPegawai);
             $pendapatanBersih = (intval($request->harga) - $upahKasirtotal) - $upahPegawaitotal;
 
@@ -162,7 +165,7 @@ class pencatatanController extends Controller
                 'satuan' => $request->satuan,
                 'qty' => $request->qty,
                 'pekerja' => join(",", $request->pegawai),
-                'kasir' => $request->kasir,
+                'kasir' => join(",", $request->kasir),
                 'harga' => $request->harga,
                 'upahPegawai' => $upahPegawaitotal,
                 'upahKasir' => $upahKasirtotal,
@@ -180,25 +183,27 @@ class pencatatanController extends Controller
                     "id_dompet" => $matchPegawai->id_dompet,
                     "nomor_transaksi" => $request->transactionNumber,
                     "transaksi" => "Deposit",
-                    "kasir" => $request->kasir,
+                    "kasir" => join(",", $request->kasir),
                     "tgl_transaksi" => $request->transactionDate,
                     "nominal" => $upahPegawaifinal
                 ]);
             };
-            $pendapatanKasir = 0;
-            $matchKasir = dompetKasir::where("name", $request->kasir)->first();
-            $pendapatanKasir = floatval($matchKasir->saldo) + $upahKasirtotal;
-            $matchKasir->update([
-                'saldo' => $pendapatanKasir
-            ]);
-            transaksiDompetKasir::create([
-                "id_dompet" => $matchKasir->id_dompet,
-                "nomor_transaksi" => $request->transactionNumber,
-                "transaksi" => "Deposit",
-                "kasir" => $request->kasir,
-                "tgl_transaksi" => $request->transactionDate,
-                "nominal" => $upahKasirtotal
-            ]);
+            for ($i = 0; $i < $jumlahKasir; $i++) {
+                $pendapatanKasir = 0;
+                $matchKasir = dompetKasir::where("name", $listKasir[$i])->first();
+                $pendapatanKasir = floatval($matchKasir->saldo) + $upahKasirfinal;
+                $matchKasir->update([
+                    'saldo' => $pendapatanKasir
+                ]);
+                transaksiDompetKasir::create([
+                    "id_dompet" => $matchKasir->id_dompet,
+                    "nomor_transaksi" => $request->transactionNumber,
+                    "transaksi" => "Deposit",
+                    "kasir" => $listKasir[$i],
+                    "tgl_transaksi" => $request->transactionDate,
+                    "nominal" => $upahKasirfinal
+                ]);
+            }
         } elseif ($request->jenisTransaksi === "Pengeluaran tambang") {
             // $pendapatanBersih = 0;
             $pendapatanBersih = 0 - floatval($request->harga);
@@ -206,7 +211,7 @@ class pencatatanController extends Controller
                 'no_transaksi' => $request->transactionNumber,
                 'tgl_transaksi' => $request->transactionDate,
                 'jenis_transaksi' => $request->jenisTransaksi,
-                'kasir' => $request->kasir,
+                'kasir' => join(",", $request->kasir),
                 'keterangan' => $request->keterangan,
                 'harga' => $request->harga,
                 'upahPegawai' => 0,
@@ -222,12 +227,12 @@ class pencatatanController extends Controller
                 'tgl_transaksi' => $request->transactionDate,
                 'jenis_transaksi' => $request->jenisTransaksi,
                 'pekerja' => join(",", $request->pegawai),
-                'kasir' => $request->kasir,
+                'kasir' => join(",", $request->kasir),
                 'harga' => $request->harga,
                 'upahPegawai' => 0,
                 'upahKasir' => 0,
                 'pendapatanBersih' => $pendapatanBersih,
-                'keterangan'=>'Penarikan Deposit atas nama'.' '. join(",", $request->pegawai)
+                'keterangan' => 'Penarikan Deposit atas nama' . ' ' . join(",", $request->pegawai)
             ]);
             for ($i = 0; $i < $jumlahPegawai; $i++) {
                 $pendapatanPegawai = 0;
@@ -240,48 +245,55 @@ class pencatatanController extends Controller
                     "id_dompet" => $matchPegawai->id_dompet,
                     "nomor_transaksi" => $request->transactionNumber,
                     "transaksi" => "Credit",
-                    "kasir" => $request->kasir,
+                    "kasir" => join(",", $request->kasir),
                     "tgl_transaksi" => $request->transactionDate,
                     "nominal" => $request->harga
                 ]);
             };
         } elseif ($request->jenisTransaksi === "Penarikan deposit kasir") {
             $pendapatanBersih = 0;
+            $jumlahKasir = count($request->kasir);
+            $listKasir = $request->kasir;
             pencatatan::create([
                 'no_transaksi' => $request->transactionNumber,
                 'tgl_transaksi' => $request->transactionDate,
                 'jenis_transaksi' => $request->jenisTransaksi,
-                'kasir' => $request->kasir,
+                'kasir' => join(",", $request->kasir),
                 'harga' => $request->harga,
                 'upahPegawai' => 0,
                 'upahKasir' => 0,
                 'pendapatanBersih' => $pendapatanBersih,
-                'keterangan' => 'Penarikan deposit atas nama'.' '.$request->kasir
+                'keterangan' => 'Penarikan deposit atas nama' . ' ' . join(",", $request->kasir)
             ]);
-            $pendapatanKasir = 0;
-            $matchKasir = dompetKasir::where("name", $request->kasir)->first();
-            $pendapatanKasir = floatval($matchKasir->saldo) - floatval($request->harga);
-            $matchKasir->update([
-                'saldo' => $pendapatanKasir
-            ]);
-            transaksiDompetKasir::create([
-                "id_dompet" => $matchKasir->id_dompet,
-                "nomor_transaksi" => $request->transactionNumber,
-                "transaksi" => "credit",
-                "kasir" => $request->kasir,
-                "tgl_transaksi" => $request->transactionDate,
-                "nominal" => $request->harga
-            ]);
+            for ($i = 0; $i < $jumlahKasir; $i++) {
+                $pendapatanKasir = 0;
+                $matchKasir = dompetKasir::where("name", $listKasir[$i])->first();
+                $pendapatanKasir = floatval($matchKasir->saldo) - floatval($request->harga);
+                $matchKasir->update([
+                    'saldo' => $pendapatanKasir
+                ]);
+                transaksiDompetKasir::create([
+                    "id_dompet" => $matchKasir->id_dompet,
+                    "nomor_transaksi" => $request->transactionNumber,
+                    "transaksi" => "credit",
+                    "kasir" => join(",", $request->kasir),
+                    "tgl_transaksi" => $request->transactionDate,
+                    "nominal" => $request->harga
+                ]);
+            }
         } elseif ($request->jenisTransaksi === "Bon truk") {
 
             if ($request->keterangan === "Bon") {
                 $upahKasir = upahKasir::where("satuan", $request->satuan)->get();
                 $upahPegawai = upahPegawai::where("satuan", $request->satuan)->get();
                 $jumlahPegawai = count($request->pegawai);
+                $jumlahKasir = count($request->kasir);
                 $listPegawai = $request->pegawai;
+                $listKasir = $request->kasir;
                 $upahKasirtotal = intval($upahKasir[0]["upah"]) * intval($request->qty);
                 $upahPegawaitotal = intval($upahPegawai[0]["upah"]) * intval($request->qty);
                 $upahPegawaifinal = floatval($upahPegawaitotal) / floatval($jumlahPegawai);
+                $upahKasirfinal = floatval($upahKasirtotal) / floatval($jumlahKasir);
                 // $Bon = 0 -($upahPegawaifinal+$upahKasirtotal);
                 $Bon = 0;
                 // $pendapatanBersih = (intval($request->harga) - $upahKasirtotal) - $upahPegawaitotal;
@@ -298,11 +310,11 @@ class pencatatanController extends Controller
                     'satuan' => $request->satuan,
                     'qty' => $request->qty,
                     'pekerja' => join(",", $request->pegawai),
-                    'kasir' => $request->kasir,
+                    'kasir' => join(",", $request->kasir),
                     'harga' => $request->harga,
                     'upahPegawai' => $upahPegawaitotal,
                     'upahKasir' => $upahKasirtotal,
-                    'keterangan' => "Bon atas nama"." ".$request->name,
+                    'keterangan' => "Bon atas nama" . " " . $request->name,
                     'pendapatanBersih' => $Bon
                 ]);
                 // if ($request->keterangan === "Bon") {
@@ -317,25 +329,27 @@ class pencatatanController extends Controller
                         "id_dompet" => $matchPegawai->id_dompet,
                         "nomor_transaksi" => $request->transactionNumber,
                         "transaksi" => "Deposit",
-                        "kasir" => $request->kasir,
+                        "kasir" => join(",", $request->kasir),
                         "tgl_transaksi" => $request->transactionDate,
                         "nominal" => $upahPegawaifinal
                     ]);
                 };
-                $pendapatanKasir = 0;
-                $matchKasir = dompetKasir::where("name", $request->kasir)->first();
-                $pendapatanKasir = floatval($matchKasir->saldo) + $upahKasirtotal;
-                $matchKasir->update([
-                    'saldo' => $pendapatanKasir
-                ]);
-                transaksiDompetKasir::create([
-                    "id_dompet" => $matchKasir->id_dompet,
-                    "nomor_transaksi" => $request->transactionNumber,
-                    "transaksi" => "Deposit",
-                    "kasir" => $request->kasir,
-                    "tgl_transaksi" => $request->transactionDate,
-                    "nominal" => $upahKasirtotal
-                ]);
+                for ($i = 0; $i < $jumlahKasir; $i++) {
+                    $pendapatanKasir = 0;
+                    $matchKasir = dompetKasir::where("name", $listKasir[$i])->first();
+                    $pendapatanKasir = floatval($matchKasir->saldo) + $upahKasirfinal;
+                    $matchKasir->update([
+                        'saldo' => $pendapatanKasir
+                    ]);
+                    transaksiDompetKasir::create([
+                        "id_dompet" => $matchKasir->id_dompet,
+                        "nomor_transaksi" => $request->transactionNumber,
+                        "transaksi" => "Deposit",
+                        "kasir" => $listKasir[$i],
+                        "tgl_transaksi" => $request->transactionDate,
+                        "nominal" => $upahKasirfinal
+                    ]);
+                }
                 $jumlahBonTruk = 0;
                 $idBon = "";
                 $bonTruk = bonTruk::where("name", $request->name)->first();
@@ -358,7 +372,7 @@ class pencatatanController extends Controller
                     'id_bon' => $idBon,
                     'no_transaksi' => $request->transactionNumber,
                     'tgl_transaksi' => $request->transactionDate,
-                    'kasir' => $request->kasir,
+                    'kasir' => join(",", $request->kasir),
                     'jenis_transaksi' => 'Bon',
                     'satuan' => $request->satuan,
                     'qty' => $request->qty,
@@ -380,11 +394,11 @@ class pencatatanController extends Controller
                     // 'satuan' => $request->satuan,
                     // 'qty' => $request->qty,
                     // 'pekerja' => join(",", $request->pegawai),
-                    'kasir' => $request->kasir,
+                    'kasir' => join(",", $request->kasir),
                     'harga' => $Bon,
                     'upahPegawai' => 0,
                     'upahKasir' => 0,
-                    'keterangan' => "Pembayaran bon atas nama"." ".$request->name,
+                    'keterangan' => "Pembayaran bon atas nama" . " " . $request->name,
                     'pendapatanBersih' => $Bon
                 ]);
                 $jumlahBonTruk = 0;
@@ -469,59 +483,21 @@ class pencatatanController extends Controller
      */
     public function delete(Request $request)
     {
-        if($request->jenis_transaksi ==="Pembelian pasir"){
+        if ($request->jenis_transaksi === "Pembelian pasir") {
             //pencatatan
-            pencatatan::where("no_transaksi",$request->no_transaksi)->delete();
-            //Transaksi kasir
-            $transaksikasir=transaksiDompetKasir::where("nomor_transaksi",$request->no_transaksi)->get();
-            $deompetkasir=dompetKasir::where("id_dompet",$transaksikasir[0]["id_dompet"])->get();
-            $saldokasir=intval($deompetkasir[0]["saldo"])-intval($transaksikasir[0]["nominal"]);
-            $deompetkasir[0]->update([
-                "saldo"=>$saldokasir
-            ]);
-            $transaksikasir[0]->delete();
-            //transaksi pegawai
-            $transaksipegawai=transaksiDompetPegawai::where("nomor_transaksi", $request->no_transaksi)->get();
-            for($i=0;$i<count($transaksipegawai);$i++){
-                $dompetpegawai=dompetPegawai::where("id_dompet",$transaksipegawai[$i]["id_dompet"])->get();
-                $saldopegawai=intval($dompetpegawai[0]["saldo"])-intval($transaksipegawai[$i]['nominal']);
-                $dompetpegawai[0]->update([
-                    "saldo"=>$saldopegawai
-                ]);
-            }
-            for($z=0;$z< count($transaksipegawai); $z++){
-                $transaksipegawai[$z]->delete();
-            }
-        }else if($request->jenis_transaksi==="Pengeluaran tambang"){
-            pencatatan::where("no_transaksi",$request->no_transaksi)->delete();
-        }else if($request->jenis_transaksi==="Penarikan deposit Kasir"){
-            pencatatan::where("no_transaksi",$request->no_transaksi)->delete();
-            $saldokasir = transaksiDompetKasir::where("nomor_transaksi",$request->no_transaksi)->first();
-            $getDompet = dompetKasir::where("id_dompet",$saldokasir->id_dompet)->first();
-            $saldo= intval($getDompet->saldo)+intval($saldokasir->nominal);
-            $getDompet->update([
-                "saldo"=>$saldo,
-            ]);
-            $saldokasir->delete();
-        }else if($request->jenis_transaksi==="Penarikan deposit pegawai"){
-            pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
-            $saldopegawai = transaksiDompetPegawai::where("nomor_transaksi", $request->no_transaksi)->first();
-            $getDompet = dompetPegawai::where("id_dompet", $saldopegawai->id_dompet)->first();
-            $saldo = intval($getDompet->saldo) + intval($saldopegawai->nominal);
-            $getDompet->update([
-                "saldo" => $saldo,
-            ]);
-            $saldopegawai->delete();
-        }else if($request->jenis_transaksi==="Bon truk"){
             pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
             //Transaksi kasir
             $transaksikasir = transaksiDompetKasir::where("nomor_transaksi", $request->no_transaksi)->get();
-            $deompetkasir = dompetKasir::where("id_dompet", $transaksikasir[0]["id_dompet"])->get();
-            $saldokasir = intval($deompetkasir[0]["saldo"]) - intval($transaksikasir[0]["nominal"]);
-            $deompetkasir[0]->update([
-                "saldo" => $saldokasir
-            ]);
-            $transaksikasir[0]->delete();
+            for ($k = 0; $k < count($transaksikasir); $k++) {
+                $deompetkasir = dompetKasir::where("id_dompet", $transaksikasir[$k]["id_dompet"])->get();
+                $saldokasir = intval($deompetkasir[0]["saldo"]) - intval($transaksikasir[$k]["nominal"]);
+                $deompetkasir[0]->update([
+                    "saldo" => $saldokasir
+                ]);
+            }
+            for ($a = 0; $a < count($transaksikasir); $a++) {
+                $transaksikasir[$a]->delete();
+            }
             //transaksi pegawai
             $transaksipegawai = transaksiDompetPegawai::where("nomor_transaksi", $request->no_transaksi)->get();
             for ($i = 0; $i < count($transaksipegawai); $i++) {
@@ -534,20 +510,74 @@ class pencatatanController extends Controller
             for ($z = 0; $z < count($transaksipegawai); $z++) {
                 $transaksipegawai[$z]->delete();
             }
-            $transaksibon = transaksiBonTruk::where("no_transaksi",$request->no_transaksi)->first();
-            $bon = bonTruk::where("id_bon",$transaksibon->id_bon)->first();
-            $saldo = intval($bon->saldo)-intval($transaksibon->Harga);
+        } else if ($request->jenis_transaksi === "Pengeluaran tambang") {
+            pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
+        } else if ($request->jenis_transaksi === "Penarikan deposit Kasir") {
+            pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
+            $saldokasir = transaksiDompetKasir::where("nomor_transaksi", $request->no_transaksi)->get();
+            for ($i = 0; $i < count($saldokasir); $i++) {
+                $getDompet = dompetKasir::where("id_dompet", $saldokasir[$i]["id_dompet"])->first();
+                $saldo = intval($getDompet->saldo) + intval($saldokasir[$i]["nominal"]);
+                $getDompet->update([
+                    "saldo" => $saldo,
+                ]);
+            }
+            for ($i = 0; $i < count($saldokasir); $i++) {
+                $saldokasir[$i]->delete();
+            }
+        } else if ($request->jenis_transaksi === "Penarikan deposit pegawai") {
+            pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
+            $saldopegawai = transaksiDompetPegawai::where("nomor_transaksi", $request->no_transaksi)->get();
+            for ($i = 0; $i < count($saldopegawai); $i++) {
+                $getDompet = dompetPegawai::where("id_dompet", $saldopegawai[$i]["id_dompet"])->first();
+                $saldo = intval($getDompet->saldo) + intval($saldopegawai[$i]["nominal"]);
+                $getDompet->update([
+                    "saldo" => $saldo,
+                ]);
+            }
+            for ($i = 0; $i < count($saldopegawai); $i++) {
+                $saldopegawai[$i]->delete();
+            }
+        } else if ($request->jenis_transaksi === "Bon truk") {
+            pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
+            //Transaksi kasir
+            $transaksikasir = transaksiDompetKasir::where("nomor_transaksi", $request->no_transaksi)->get();
+            for ($k = 0; $k < count($transaksikasir); $k++) {
+                $deompetkasir = dompetKasir::where("id_dompet", $transaksikasir[$k]["id_dompet"])->get();
+                $saldokasir = intval($deompetkasir[0]["saldo"]) - intval($transaksikasir[$k]["nominal"]);
+                $deompetkasir[0]->update([
+                    "saldo" => $saldokasir
+                ]);
+            }
+            for ($r = 0; $r < count($transaksikasir); $r++) {
+                $transaksikasir[$r]->delete();
+            }
+            //transaksi pegawai
+            $transaksipegawai = transaksiDompetPegawai::where("nomor_transaksi", $request->no_transaksi)->get();
+            for ($i = 0; $i < count($transaksipegawai); $i++) {
+                $dompetpegawai = dompetPegawai::where("id_dompet", $transaksipegawai[$i]["id_dompet"])->get();
+                $saldopegawai = intval($dompetpegawai[0]["saldo"]) - intval($transaksipegawai[$i]['nominal']);
+                $dompetpegawai[0]->update([
+                    "saldo" => $saldopegawai
+                ]);
+            }
+            for ($z = 0; $z < count($transaksipegawai); $z++) {
+                $transaksipegawai[$z]->delete();
+            }
+            $transaksibon = transaksiBonTruk::where("no_transaksi", $request->no_transaksi)->first();
+            $bon = bonTruk::where("id_bon", $transaksibon->id_bon)->first();
+            $saldo = intval($bon->saldo) - intval($transaksibon->Harga);
             $bon->update([
-                "saldo"=>$saldo
+                "saldo" => $saldo
             ]);
             $transaksibon->delete();
-        }else{
+        } else {
             pencatatan::where("no_transaksi", $request->no_transaksi)->delete();
-            $transaksibon= transaksiBonTruk::where("no_transaksi",$request->no_transaksi)->first();
-            $bon= bonTruk::where("id_bon",$transaksibon->id_bon)->first();
-            $saldo= intval($bon->saldo)+intval($transaksibon->Harga);
+            $transaksibon = transaksiBonTruk::where("no_transaksi", $request->no_transaksi)->first();
+            $bon = bonTruk::where("id_bon", $transaksibon->id_bon)->first();
+            $saldo = intval($bon->saldo) + intval($transaksibon->Harga);
             $bon->update([
-                "saldo"=>$saldo
+                "saldo" => $saldo
             ]);
             $transaksibon->delete();
         }

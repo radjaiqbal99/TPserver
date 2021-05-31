@@ -18,10 +18,10 @@ class dompetPegawaiController extends Controller
      */
     public function index()
     {
-        $result = dompetPegawai::get();
+        $result = dompetPegawai::orderBy('id', 'DESC')->get();
         // $result2 = transaksiDompetKasir::get();
         for ($i = 0; $i < count($result); $i++) {
-            $transaksi = transaksiDompetPegawai::where('id_dompet', $result[$i]['id_dompet'])->get();
+            $transaksi = transaksiDompetPegawai::orderBy('id', 'DESC')->where('id_dompet', $result[$i]['id_dompet'])->get();
             $response[$i] = [
                 'id' => $result[$i]['id'],
                 'id_dompet' => $result[$i]['id_dompet'],
